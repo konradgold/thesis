@@ -1,0 +1,17 @@
+[project]
+name = "tadaconv"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "einops>=0.8.1",
+    "ffmpeg>=1.4",
+    "ffmpeg-python>=0.2.0",
+    "numpy>=2.3.4",
+    "opencv-python>=4.11.0.86",
+    "pyyaml>=6.0.3",
+    "simplejson>=3.20.2",
+    "torch>=2.9.0",
+    "torchvision>=0.24.0",
+]
