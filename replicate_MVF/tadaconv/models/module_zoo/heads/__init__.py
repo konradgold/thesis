@@ -5,3 +5,4 @@ from .mosi_head import MoSIHeadJoint
 from .slowfast_head import SlowFastHead
 from .transformer_head import TransformerHead
 from .bmn_head import BaseBMN
+from .foul_head import FOULHead

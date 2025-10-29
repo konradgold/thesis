@@ -35,6 +35,7 @@ class Config(object):
             cfg_dict = self._load_yaml(self.args)
             cfg_dict = self._merge_cfg_from_base(cfg_base, cfg_dict)
             self.cfg_dict = cfg_dict
+
         self._update_dict(cfg_dict)
         if load:
             ckp.make_checkpoint_dir(self.OUTPUT_DIR)

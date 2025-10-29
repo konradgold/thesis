@@ -1,10 +1,10 @@
 _BASE_RUN: ../../pool/run/training/from_scratch_large.yaml
-_BASE_MODEL: ../../pool/backbone/tadaformer_l14.yaml
+_BASE_MODEL: ../../pool/backbone/tadaformer_l14_soccer.yaml
 
 PRETRAIN:
   ENABLE: false
 TRAIN:
-  ENABLE: false
+  ENABLE: true
   DATASET: kinetics400
   BATCH_SIZE: 64
   FINE_TUNE: true

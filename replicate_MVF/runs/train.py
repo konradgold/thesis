@@ -67,13 +67,12 @@ def train_epoch(
     train_meter.iter_tic()
     data_size = len(train_loader)
 
-    for cur_iter, (inputs, labels, indexes, meta) in enumerate(train_loader):
+    for cur_iter, (inputs, masks, labels) in enumerate(train_loader):
         # Transfer the data to the current GPU device.        
         if misc.get_num_gpus(cfg):
             if not cfg.AUGMENTATION.USE_GPU:
                 inputs = tu.tensor2cuda(inputs)
             labels = tu.tensor2cuda(labels)
-            meta = tu.tensor2cuda(meta)
 
         # perform mixup on the input
         if mixup_fn is not None:
@@ -84,7 +83,7 @@ def train_epoch(
         optim.set_lr(optimizer, lr)
 
         # Perform the forward pass.
-        preds, logits = model(inputs)
+        preds, logits = model(inputs, masks)
 
         loss, loss_in_parts, weight = losses.calculate_loss(cfg, preds, logits, labels, cur_epoch + cfg.TRAIN.NUM_FOLDS * float(cur_iter) / data_size)
         

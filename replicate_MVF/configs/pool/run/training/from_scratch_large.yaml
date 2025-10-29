@@ -10,10 +10,10 @@ TRAIN:
   NUM_FOLDS: 1
   AUTO_RESUME: true
   CHECKPOINT_PERIOD: 5
-  CHECKPOINT_FILE_PATH: ""          # !!@2
+  CHECKPOINT_FILE_PATH: "checkpoints"        # !!@2
   CHECKPOINT_TYPE: pytorch
   CHECKPOINT_INFLATE: false
-  FINE_TUNE: false
+  FINE_TUNE: true
   ONLY_LINEAR: false
 TEST:
   ENABLE: true                     # !!@3

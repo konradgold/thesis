@@ -5,7 +5,6 @@
 
 import torch
 import torch.nn as nn
-import torchvision
 from tadaconv.utils.registry import Registry
 from tadaconv.models.base.base_blocks import (
     Base3DResStage, STEM_REGISTRY, BRANCH_REGISTRY, InceptionBaseConv3D
@@ -302,6 +301,37 @@ class VisionTransformer(nn.Module):
         x = x.permute(1, 0, 2)  # LND -> NLD
 
         return x
+
+@BACKBONE_REGISTRY.register()
+class FOULVisionTransformer(VisionTransformer):
+    def __init__(self, cfg):
+        super(FOULVisionTransformer, self).__init__(cfg)
+
+    def forward(self, x, mask=None):
+        if isinstance(x, dict):
+            video = x["video"]
+        else:
+            video = x
+
+        if mask is None:
+            return super().forward(video)
+
+        # ensure mask is a boolean tensor on the same device as video
+        mask = mask.to(device=video.device)
+        mask_bool = mask.bool()
+
+        # mask shape should be (B, V). Select all (B,V) entries where mask is True.
+        # This will flatten the first two dims and produce a tensor of shape (B'*V', ...)
+        video = video[mask_bool]
+
+        # forward the selected videos through the parent VisionTransformer
+        x = super().forward(video)
+
+        B, V = mask.shape
+        T = x.shape[1:]
+        x_mask = torch.zeros((B, V) + T, dtype=x.dtype, device=x.device)
+        x_mask[mask_bool] = x
+        return x_mask, mask
 
 @BACKBONE_REGISTRY.register()
 class ConvNeXt(nn.Module):
