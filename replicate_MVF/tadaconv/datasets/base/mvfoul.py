@@ -113,9 +113,11 @@ class Mvfoul(torch.utils.data.Dataset):
 
         vid.release()
         selected = torch.stack([torch.from_numpy(frame) for frame in frames])
-        selected = selected.permute(3, 0, 1, 2).float()
+        
         if not self.cfg.PRETRAIN.ENABLE:
-            selected = self.transform(selected)  # T, C, H, W
+            selected = self.transform(selected)  #  C, T, H, W
+        else:
+            selected = selected.permute(3,0,1,2)
         return selected.unsqueeze(0)
 
 
