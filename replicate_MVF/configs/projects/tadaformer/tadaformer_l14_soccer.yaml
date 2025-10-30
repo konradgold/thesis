@@ -6,7 +6,7 @@ PRETRAIN:
 TRAIN:
   ENABLE: true
   DATASET: Mvfoul
-  BATCH_SIZE: 3
+  BATCH_SIZE: 2
   FINE_TUNE: true
   LR_REDUCE: true
   INIT: clip

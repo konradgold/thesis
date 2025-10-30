@@ -23,6 +23,9 @@ video_tensor = torch.cat([video_tensor1, video_tensor2], dim=0).unsqueeze(0)
 
 video_tensor = torch.cat([video_tensor, video_tensor], dim=0)  # (B, V, C, T, H, W)
 
+print(f"Input video tensor shape: {video_tensor.shape}")
+exit()
+
 assert (video_tensor.shape[0], video_tensor.shape[1]) == (2, 2), "Expected 2 views in the input tensor"
 
 cfg = Config(load=True)

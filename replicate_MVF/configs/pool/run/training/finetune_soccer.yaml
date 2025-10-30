@@ -3,7 +3,7 @@ PRETRAIN:
 TRAIN:
   ENABLE: true
   DATASET: MVFoul                    # !!@1
-  BATCH_SIZE: 3
+  BATCH_SIZE: 2
   LOG_FILE: training_log.log
   LOSS_FUNC: cross_entropy
   EVAL_PERIOD: 5
