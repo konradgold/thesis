@@ -8,3 +8,4 @@ from .ssv2 import Ssv2
 from .imagenet import Imagenet
 from .epickitchen100_feature import Epickitchen100localization
 from .epickitchen100 import Epickitchen100
+from .mvfoul import Mvfoul

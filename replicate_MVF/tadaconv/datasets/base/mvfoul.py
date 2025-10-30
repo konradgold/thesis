@@ -5,20 +5,21 @@
 
 import json
 import os
-from turtle import width
-
 import cv2
 import torch
 import tadaconv.utils.logging as logging
 from tadaconv.datasets.base.builder import DATASET_REGISTRY
+from tadaconv.utils.mvfoul_translation import translate_annotation
 from utils import crop_center
 
 logger = logging.get_logger(__name__)
 
+
+
 @DATASET_REGISTRY.register()
-class MVFoul(torch.utils.data.Dataset):
+class Mvfoul(torch.utils.data.Dataset):
     def __init__(self, cfg, split):
-        super(MVFoul, self).__init__() 
+        super(Mvfoul, self).__init__() 
         self.cfg = cfg
         self.split = split
         self.data_root_dir  = cfg.DATA.DATA_ROOT_DIR
@@ -27,6 +28,12 @@ class MVFoul(torch.utils.data.Dataset):
 
     
     def _construct_dataset(self):
+        if self.split == "train":
+            self.crop_size = self.cfg.DATA.TRAIN_CROP_SIZE
+        else:
+            self.crop_size = self.cfg.DATA.TEST_CROP_SIZE
+
+
         path = os.path.join(
             self.data_root_dir,
             self.split)
@@ -56,9 +63,6 @@ class MVFoul(torch.utils.data.Dataset):
         feature = self._read_videos_from_dir(os.path.join(self.data_root_dir, dir_name))
         return feature[0], feature[1], self.labels[index]
 
-    def _process_labels(self, annotations):
-        return list(annotations.values())
-
     def _read_videos_from_dir(self, dir_path):
         video_files = sorted(os.listdir(dir_path))
         video_tensors = []
@@ -66,17 +70,19 @@ class MVFoul(torch.utils.data.Dataset):
             video_path = os.path.join(dir_path, vf)
             video_tensor = self._load_video(video_path)
             video_tensors.append(video_tensor)
-        num_views = len(video_tensors)
-        if num_views < self.cfg.DATA.NUM_VIEWS:
+            if len(video_tensors) == self.cfg.DATA.NUM_VIEWS:
+                break
+        actual_views = len(video_tensors)
+        if actual_views < self.cfg.DATA.NUM_VIEWS:
             # pad with empty tensors
-            num_missing = self.cfg.DATA.NUM_VIEWS - num_views
+            num_missing = self.cfg.DATA.NUM_VIEWS - actual_views
             C, T, H, W = video_tensors[0].shape
             for _ in range(num_missing):
                 video_tensors.append(torch.zeros((C, T, H, W)))
-        video_tensor = torch.stack(video_tensors, dim=0)  #(num_views, C, T, H, W)
+        video_tensor = torch.cat(video_tensors, dim=0)  #(num_views, C, T, H, W)
 
         mask = torch.arange(self.cfg.DATA.NUM_VIEWS)
-        mask[num_views:] = -1
+        mask[actual_views:] = -1
 
         return video_tensor, mask
     
@@ -91,7 +97,7 @@ class MVFoul(torch.utils.data.Dataset):
         indices = self._custom_sampling(
             vid_length=num_frames,
             vid_fps=fps,
-            num_frames=self.cfg.DATA.NUM_FRAMES,
+            num_frames=self.cfg.DATA.NUM_INPUT_FRAMES,
             interval=2,
             height=height,
             width=width,
@@ -102,7 +108,7 @@ class MVFoul(torch.utils.data.Dataset):
             vid.set(cv2.CAP_PROP_POS_FRAMES, idx)
             success, frame = vid.read()
             if success:
-                frames.append(crop_center(frame, width, height))
+                frames.append(crop_center(frame, self.crop_size, self.crop_size))
 
 
         vid.release()
@@ -131,3 +137,10 @@ class MVFoul(torch.utils.data.Dataset):
             width):
         indices = torch.linspace(0, vid_length - 1, steps=num_frames).long()
         return indices
+    
+    def _process_labels(self, annotations):
+        labels = []
+        for idx, annotation in annotations.items():
+            label = translate_annotation(annotation)
+            labels.append(label)
+        return labels

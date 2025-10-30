@@ -34,15 +34,16 @@ print("Model loaded.")
 
 
 mask = torch.ones((video_tensor.shape[0], video_tensor.shape[1]), dtype=torch.long)
+mask[0,1] = 0
 
 model.eval()
 with torch.no_grad():
     out = model(video_tensor, mask=mask)
 
-assert out[0].shape[0] == mask.shape[0], "Output batch size does not match input batch size"
-
-k = min(10, out[0].shape[1])
-values, indices = torch.topk(out[0], k=k, dim=1)
+assert out[0]['severity'].shape[0] == mask.shape[0], "Output batch size does not match input batch size"
+print(f"Output shape: {out[0]['severity'].shape}")
+k = min(10, out[0]['severity'].shape[1])
+values, indices = torch.topk(out[0]['severity'], k=k, dim=1)
 for rank, (v, i) in enumerate(zip(values[0], indices[0]), start=1):
     print(f"{rank}: {v.item():.6f} - {labels[i.item()]}")
 

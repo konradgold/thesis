@@ -54,6 +54,9 @@ def build_loader(cfg, split):
     Returns:
         loader object. 
     """
+    batch_size = 0 # make pylint happy
+    shuffle = True  # make pylint happy
+    drop_last = False  # make pylint happy
     assert split in ["train", "val", "test", "submission"]
     if split in ["train"]:
         dataset_name = cfg.TRAIN.DATASET

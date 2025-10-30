@@ -22,3 +22,6 @@ datasets [18].
 For training:
 - [ ] Implement Augmentations
 - [ ] Two stages
+
+
+- Paths to manually adapt: Data Root Dir
