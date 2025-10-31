@@ -108,7 +108,7 @@ class Mvfoul(torch.utils.data.Dataset):
             vid.set(cv2.CAP_PROP_POS_FRAMES, idx)
             success, frame = vid.read()
             if success:
-                frames.append(crop_center(frame, self.crop_size, self.crop_size))
+                frames.append(frame)
 
 
         vid.release()
